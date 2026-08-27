@@ -31,3 +31,4 @@ C:\Users\User\Desktop\COURSES\ASP.NET Core API\HotelListingApi\HotelListingApi\o
 C:\Users\User\Desktop\COURSES\ASP.NET Core API\HotelListingApi\HotelListingApi\obj\Debug\net10.0\HotelListingApi.pdb
 C:\Users\User\Desktop\COURSES\ASP.NET Core API\HotelListingApi\HotelListingApi\obj\Debug\net10.0\HotelListingApi.genruntimeconfig.cache
 C:\Users\User\Desktop\COURSES\ASP.NET Core API\HotelListingApi\HotelListingApi\obj\Debug\net10.0\ref\HotelListingApi.dll
+C:\Users\User\Desktop\COURSES\ASP.NET Core API\HotelListingApi\HotelListingApi\obj\Debug\net10.0\HotelListingApi.sourcelink.json
