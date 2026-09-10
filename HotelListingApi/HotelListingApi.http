@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ###
 
-@id=1
+@id=2
 DELETE {{HotelListingApi_HostAddress}}/api/hotels/{{id}}
 
 ###
