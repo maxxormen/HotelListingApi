@@ -40,3 +40,41 @@ Content-Type: application/json
 }
 
 ###
+
+// Country http requests
+
+GET {{HotelListingApi_HostAddress}}/api/countries/
+Accept: application/json
+
+###
+
+POST {{HotelListingApi_HostAddress}}/api/countries/
+Content-Type: application/json
+
+{
+    "name": "Kalap",
+    "shortName": "KLP"
+}
+
+###
+
+@id=1
+DELETE {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+
+###
+
+GET {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+Accept: application/json
+
+###
+
+PUT {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+Content-Type: application/json
+
+{
+    "countryId": 1,
+    "name": "Jamaica",
+    "shortName": "JM"
+}
+
+###
