@@ -11,32 +11,33 @@ POST {{HotelListingApi_HostAddress}}/api/hotels/
 Content-Type: application/json
 
 {
-    "id": 2,
-    "name": "Hotelsdgs Test",
-    "address": "123 Test Street",
-    "rating": 4.5
+    "name": "Zdravstvuite Test",
+    "address": "ale4 Street",
+    "rating": 4,
+    "countryId": 2004
 }
 
 ###
 
-@id=2
-DELETE {{HotelListingApi_HostAddress}}/api/hotels/{{id}}
+@hotelid=2003
+DELETE {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 
 ###
 
-GET {{HotelListingApi_HostAddress}}/api/hotels/{{id}}
+GET {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 Accept: application/json
 
 ###
 
-PUT {{HotelListingApi_HostAddress}}/api/hotels/{{id}}
+PUT {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 Content-Type: application/json
 
 {
-    "id": 2,
+    "id": 1,
     "name": "Updated Hotel Test2",
     "address": "456 Updated Street",
-    "rating": 4.8
+    "rating": 4.8,
+    "countryId": 2002
 }
 
 ###
@@ -52,23 +53,23 @@ POST {{HotelListingApi_HostAddress}}/api/countries/
 Content-Type: application/json
 
 {
-    "name": "Kalap",
-    "shortName": "KLP"
+    "name": "Pisun",
+    "shortName": "PSN"
 }
 
 ###
 
-@id=1
-DELETE {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+@countryId=2004
+DELETE {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
 
 ###
 
-GET {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+GET {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
 Accept: application/json
 
 ###
 
-PUT {{HotelListingApi_HostAddress}}/api/countries/{{id}}
+PUT {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
 Content-Type: application/json
 
 {

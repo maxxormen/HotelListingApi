@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 namespace HotelListingApi.Data;
 public class Hotel
 {
@@ -6,5 +7,6 @@ public class Hotel
     public string Address { get; set; }
     public double Rating { get; set; }
     public int CountryId { get; set; }
+    [JsonIgnore]
     public Country? Country { get; set; }
 }
