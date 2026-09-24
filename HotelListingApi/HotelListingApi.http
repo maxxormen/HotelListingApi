@@ -33,7 +33,7 @@ PUT {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 Content-Type: application/json
 
 {
-    "id": 1,
+    "id": 2003,
     "name": "Updated Hotel Test2",
     "address": "456 Updated Street",
     "rating": 4.8,
@@ -59,7 +59,7 @@ Content-Type: application/json
 
 ###
 
-@countryId=2004
+@countryId=2002
 DELETE {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
 
 ###
