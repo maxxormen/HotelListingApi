@@ -1,4 +1,7 @@
 using HotelListingApi.Data;
+using HotelListingApi.Contracts;
+using HotelListingApi.Services.CountriesServices;
+using HotelListingApi.Services.HotelsServices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("HotelListingConnectionString");
 builder.Services.AddDbContext<HotelListingDbContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddScoped<ICountriesServices, CountriesServices>();
+
+builder.Services.AddScoped<IHotelsServices, HotelServices>();
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

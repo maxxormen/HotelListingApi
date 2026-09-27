@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
     "id": 2003,
-    "name": "Updated Hotel Test2",
+    "name": "Updated Hotel Test4",
     "address": "456 Updated Street",
     "rating": 4.8,
     "countryId": 2002

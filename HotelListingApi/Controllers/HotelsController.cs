@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HotelListingApi.Data;
 using HotelListingApi.DTOs.Hotel;
+using HotelListingApi.Contracts;
 
 namespace HotelListingApi.Controllers;
 
@@ -9,27 +10,18 @@ namespace HotelListingApi.Controllers;
 [ApiController]
 public class HotelsController : ControllerBase
 {
-    private readonly HotelListingDbContext _context;
+    private readonly IHotelsServices hotelsServices;
 
-    public HotelsController(HotelListingDbContext context)
+    public HotelsController(IHotelsServices hotelsServices)
     {
-        _context = context;
+        this.hotelsServices = hotelsServices;
     }
 
     // GET: api/Hotels
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
-        var hotels = await _context.Hotels
-            .Include(h => h.Country)
-            .Select(h => new GetHotelsDto(
-                h.Id,
-                h.Name,
-                h.Address,
-                h.Rating,
-                h.CountryId
-            ))
-            .ToListAsync();
+        var hotels = await hotelsServices.GetHotelsAsync();
         return Ok(hotels);
     }
 
@@ -37,18 +29,7 @@ public class HotelsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
     {
-        var hotel = await _context.Hotels
-            .Where(h => h.Id == id)
-            .Select(h => new GetHotelDto(
-                h.Id,
-                h.Name,
-                h.Address,
-                h.Rating,
-                h.CountryId,
-                h.Country!.Name
-            ))
-            .FirstOrDefaultAsync();
-
+        var hotel = await hotelsServices.GetHotelAsync(id);
         if (hotel == null)
         {
             return NotFound();
@@ -67,24 +48,19 @@ public class HotelsController : ControllerBase
             return BadRequest();
         }
 
-        var hotel = await _context.Hotels.FindAsync(id);
+        var hotel = await hotelsServices.GetHotelAsync(id);
         if (hotel == null)
         {
             return NotFound();
         }
 
-        hotel.Name = hotelDto.Name;
-        hotel.Address = hotelDto.Address;
-        hotel.Rating = hotelDto.Rating;
-        hotel.CountryId = hotelDto.CountryId;
-
         try
         {
-            await _context.SaveChangesAsync();
+            await hotelsServices.UpdateHotelAsync(id, hotelDto);
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!await HotelExistsAsync(id))
+            if (!await hotelsServices.HotelExistsAsync(id))
             {
                 return NotFound();
             }
@@ -102,38 +78,23 @@ public class HotelsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Hotel>> PostHotel(CreateHotelDto hotelDto)
     {
-        var hotel = new Hotel
-        {
-            Name = hotelDto.Name,
-            Address = hotelDto.Address,
-            Rating = hotelDto.Rating,
-            CountryId = hotelDto.CountryId
-        };
+        var hotel = await hotelsServices.CreateHotelAsync(hotelDto);
 
-        _context.Hotels.Add(hotel);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction("GetHotel", new { id = hotel.Id }, hotel);
+        return CreatedAtAction(nameof(GetHotel), new { id = hotel.Id }, hotel);
     }
 
     // DELETE: api/Hotels/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteHotel(int id)
     {
-        var hotel = await _context.Hotels.FindAsync(id);
+        var hotel = await hotelsServices.GetHotelAsync(id);
         if (hotel == null)
         {
             return NotFound();
         }
 
-        _context.Hotels.Remove(hotel);
-        await _context.SaveChangesAsync();
+        await hotelsServices.DeleteHotelAsync(id);
 
         return NoContent();
-    }
-
-    private async Task<bool> HotelExistsAsync(int id)
-    {
-        return await _context.Hotels.AnyAsync(e => e.Id == id);
     }
 }
