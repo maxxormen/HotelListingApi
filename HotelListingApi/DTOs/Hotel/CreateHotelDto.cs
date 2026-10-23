@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace HotelListingApi.DTOs.Hotel;
 
 public class CreateHotelDto
@@ -16,32 +17,7 @@ public class CreateHotelDto
     public int CountryId { get; set; }
 }
 
-public record GetHotelsDto(
-    int Id,
-    string Name, 
-    string Address, 
-    double Rating, 
-    int CountryId
-);
-
-public record GetHotelDto(
-    int Id,
-    string Name, 
-    string Address, 
-    double Rating, 
-    int CountryId,
-    string Country
-);
-
-public record GetHotelSlimDto(
-    int Id,
-    string Name, 
-    string Address, 
-    double Rating
-);
-
 public class UpdateHotelDto : CreateHotelDto
 {
-    [Required]
-    public int Id { get; set; }
+
 }

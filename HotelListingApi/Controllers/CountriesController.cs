@@ -3,12 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using HotelListingApi.Data;
 using HotelListingApi.DTOs.Country;
 using HotelListingApi.Contracts;
+using HotelListingApi.Results;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelListingApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CountriesController : ControllerBase
+public class CountriesController : BaseApiController
 {
     private readonly ICountriesServices countriesServices;
 
@@ -18,81 +20,49 @@ public class CountriesController : ControllerBase
     }
     // GET: api/Countries
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<GetCountriesDto>>> GetCountries()
     {
-        var countries = await countriesServices.GetCountriesAsync();
-        return Ok(countries);
+        var result = await countriesServices.GetCountriesAsync();
+        return ToActionResult(result);
     }
 
     // GET: api/Countries/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<GetCountryDto>> GetCountry(int id)
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<GetCountryDto?>> GetCountry(int id)
     {
-        var country = await countriesServices.GetCountryAsync(id);
-        if (country == null)
-        {
-            return NotFound();
-        }
-
-        return country;
+        var result = await countriesServices.GetCountryAsync(id);
+        return ToActionResult(result);
     }
 
     // PUT: api/Countries/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCountry(int id, UpdateCountryDto countryDto)
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult> PutCountry(int id, UpdateCountryDto countryDto)
     {
-        if (id != countryDto.CountryId)
-        {
-            return BadRequest();
-        }
-
-        var country = await countriesServices.GetCountryAsync(id);
-        
-        if (country == null)
-        {
-            return NotFound();
-        }
-
-        try
-        {
-            await countriesServices.UpdateCountryAsync(id, countryDto);
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await countriesServices.CountryExistsAsync(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        var result = await countriesServices.UpdateCountryAsync(id, countryDto);
+        return ToActionResult(result);
     }
 
     // POST: api/Countries
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<Country>> PostCountry(CreateCountryDto countryDto)
     {
-        var resultDto = await countriesServices.CreateCountryAsync(countryDto);
-        return CreatedAtAction(nameof(GetCountry), new { id = resultDto.CountryId }, resultDto);
+        var result = await countriesServices.CreateCountryAsync(countryDto);
+        if (!result.IsSuccess) return MapErrorsToResponse(result.Errors);
+        return CreatedAtAction(nameof(GetCountry), new { id = result.Value!.CountryId }, result.Value);
     }
 
     // DELETE: api/Countries/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteCountry(int id)
     {
-        var country = await countriesServices.GetCountryAsync(id);
-        if (country == null)
-        {
-            return NotFound();
-        }
-
-        await countriesServices.DeleteCountryAsync(id);
-        return NoContent();
+        var result = await countriesServices.DeleteCountryAsync(id);
+        return ToActionResult(result);
     }
 }

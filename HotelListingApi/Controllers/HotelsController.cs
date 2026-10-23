@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HotelListingApi.Data;
 using HotelListingApi.DTOs.Hotel;
 using HotelListingApi.Contracts;
+using HotelListingApi.Results;
 
 namespace HotelListingApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class HotelsController : ControllerBase
+public class HotelsController : BaseApiController
 {
     private readonly IHotelsServices hotelsServices;
 
@@ -21,21 +20,16 @@ public class HotelsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
-        var hotels = await hotelsServices.GetHotelsAsync();
-        return Ok(hotels);
+        var result = await hotelsServices.GetHotelsAsync();
+        return ToActionResult(result);
     }
 
     // GET: api/Hotels/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<GetHotelDto>> GetHotel(int id)
+    public async Task<ActionResult<GetHotelDto?>> GetHotel(int id)
     {
-        var hotel = await hotelsServices.GetHotelAsync(id);
-        if (hotel == null)
-        {
-            return NotFound();
-        }
-
-        return hotel;
+        var result = await hotelsServices.GetHotelAsync(id);
+        return ToActionResult(result);
     }
 
     // PUT: api/Hotels/5
@@ -43,58 +37,26 @@ public class HotelsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> PutHotel(int id, UpdateHotelDto hotelDto)
     {
-        if (id != hotelDto.Id)
-        {
-            return BadRequest();
-        }
-
-        var hotel = await hotelsServices.GetHotelAsync(id);
-        if (hotel == null)
-        {
-            return NotFound();
-        }
-
-        try
-        {
-            await hotelsServices.UpdateHotelAsync(id, hotelDto);
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await hotelsServices.HotelExistsAsync(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        var result = await hotelsServices.UpdateHotelAsync(id, hotelDto);
+        return ToActionResult(result);
     }
 
     // POST: api/Hotels
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Hotel>> PostHotel(CreateHotelDto hotelDto)
+    public async Task<ActionResult<GetHotelDto>> PostHotel(CreateHotelDto hotelDto)
     {
-        var hotel = await hotelsServices.CreateHotelAsync(hotelDto);
+        var result = await hotelsServices.CreateHotelAsync(hotelDto);
+        if (!result.IsSuccess) return MapErrorsToResponse(result.Errors);
 
-        return CreatedAtAction(nameof(GetHotel), new { id = hotel.Id }, hotel);
+        return CreatedAtAction(nameof(GetHotel), new { id = result.Value!.Id }, result.Value);
     }
 
     // DELETE: api/Hotels/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteHotel(int id)
     {
-        var hotel = await hotelsServices.GetHotelAsync(id);
-        if (hotel == null)
-        {
-            return NotFound();
-        }
-
-        await hotelsServices.DeleteHotelAsync(id);
-
-        return NoContent();
+        var result = await hotelsServices.DeleteHotelAsync(id);
+        return ToActionResult(result);
     }
 }

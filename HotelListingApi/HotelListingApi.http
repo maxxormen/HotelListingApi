@@ -1,4 +1,6 @@
 @HotelListingApi_HostAddress = http://localhost:5298
+@apiKey=dXNlcjFAbG9jYWxob3N0LmNvbTpQQHNzdzByZEAxMjM=
+###
 
 // Hotel http requests
 
@@ -11,15 +13,15 @@ POST {{HotelListingApi_HostAddress}}/api/hotels/
 Content-Type: application/json
 
 {
-    "name": "Zdravstvuite Test",
-    "address": "ale4 Street",
+    "name": "Zdravstvuitedf Test",
+    "address": "alesdf4 Street",
     "rating": 4,
     "countryId": 2004
 }
 
 ###
 
-@hotelid=2003
+@hotelid=4002
 DELETE {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 
 ###
@@ -33,11 +35,10 @@ PUT {{HotelListingApi_HostAddress}}/api/hotels/{{hotelid}}
 Content-Type: application/json
 
 {
-    "id": 2003,
-    "name": "Updated Hotel Test4",
-    "address": "456 Updated Street",
+    "name": "Updated Hoteldf Test4",
+    "address": "456 Updatesgd Street",
     "rating": 4.8,
-    "countryId": 2002
+    "countryId": 2004
 }
 
 ###
@@ -45,22 +46,24 @@ Content-Type: application/json
 // Country http requests
 
 GET {{HotelListingApi_HostAddress}}/api/countries/
-Accept: application/json
-
+#Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMThjODRjYS0yODZmLTQwMzEtYTkxMy1hNjhjZTc1ODMzMmQiLCJlbWFpbCI6ImFkbWluY2hpazFAZ21haWwuY29tIiwianRpIjoiNTFkMDZjN2YtYjM3Yi00OTFhLWJjODktNTU3YzViNmQ2OWRiIiwibmFtZSI6IkFkbWluIEFkbWlub3ZpY2giLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbmlzdHJhdG9yIiwiZXhwIjoxNzkyNDQzOTIzLCJpc3MiOiJIb3RlbExpc3RpbmdBcGkiLCJhdWQiOiJIb3RlbExpc3RpbmdBcGlDbGllbnQifQ.YrRP0lqEcSwCQYT4d7043yLFA30AC2JcP8Jr3XJGBCE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NGVhZWNkMS1kZGJlLTRkZTctYmVkZC1jYjdjMWVlNzlmYjciLCJlbWFpbCI6InByaXZldDFAZ21haWwuY29tIiwianRpIjoiYzJkZGQwNjItYTUzZC00M2FiLWFlMDMtMTJkMDcyM2Q4MWIxIiwibmFtZSI6IlVzZXIgVXNlcm92aWNoIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc5MjQ0NDAyMywiaXNzIjoiSG90ZWxMaXN0aW5nQXBpIiwiYXVkIjoiSG90ZWxMaXN0aW5nQXBpQ2xpZW50In0.gMW6tDw31eoP-gBCdX4wLDV78q88AYIh_AlizbiiNPo
 ###
 
 POST {{HotelListingApi_HostAddress}}/api/countries/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMThjODRjYS0yODZmLTQwMzEtYTkxMy1hNjhjZTc1ODMzMmQiLCJlbWFpbCI6ImFkbWluY2hpazFAZ21haWwuY29tIiwianRpIjoiNDc1ZWRkNDUtMWJhMy00OTdlLTgzNzYtOTQyYTMxYzIwNDAwIiwibmFtZSI6IkFkbWluIEFkbWlub3ZpY2giLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbmlzdHJhdG9yIiwiZXhwIjoxNzkyNDQ0MjE3LCJpc3MiOiJIb3RlbExpc3RpbmdBcGkiLCJhdWQiOiJIb3RlbExpc3RpbmdBcGlDbGllbnQifQ.d3IeEDr50fdBOyD4OMwOWS0i4ZQ0WFPeB-Kh4kvn25g
 
 {
-    "name": "Pisun",
-    "shortName": "PSN"
+    "name": "Pozor",
+    "shortName": "PZR"
 }
 
 ###
 
-@countryId=2002
+@countryId=2004
 DELETE {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NGVhZWNkMS1kZGJlLTRkZTctYmVkZC1jYjdjMWVlNzlmYjciLCJlbWFpbCI6InByaXZldDFAZ21haWwuY29tIiwianRpIjoiODkyNjQwODEtZmNhNy00MjlhLTk1ZTItZGU4ZTM2MjY5Y2Q0IiwibmFtZSI6IlVzZXIgVXNlcm92aWNoIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc5MjQ0NDYxNCwiaXNzIjoiSG90ZWxMaXN0aW5nQXBpIiwiYXVkIjoiSG90ZWxMaXN0aW5nQXBpQ2xpZW50In0.r4CfnIpwjpzsPTVfFAm4bv9S-iZMZywEDLES-EbZIeo
 
 ###
 
@@ -73,9 +76,52 @@ PUT {{HotelListingApi_HostAddress}}/api/countries/{{countryId}}
 Content-Type: application/json
 
 {
-    "countryId": 1,
+    "countryId": 2004,
     "name": "Jamaica",
     "shortName": "JM"
 }
 
 ###
+
+// Authentification requests
+
+POST {{HotelListingApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@localhost.com",
+  "password": "P@ssw0rd@123"
+}
+###
+
+POST {{HotelListingApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "user1@localhost.com",
+    "password": "P@ssw0rd@123",
+    "firstName" : "Admin",
+    "lastName" : "Adminovich",
+    "role" : "Administrator"
+}
+
+###
+
+GET {{HotelListingApi_HostAddress}}/api/apikey
+X-Api-Key: {{apiKey}}
+
+###
+
+GET {{HotelListingApi_HostAddress}}/api/basicauth
+Authorization: Basic dXNlcjFAbG9jYWxob3N0LmNvbTpQQHNzdzByZEAxMjM=
+
+###
+
+
+
+
+# "email" : "adminchik1@gmail.com",
+#     "password" : "yaAdminL@L1",
+#     "firstName" : "Admin",
+#     "lastName" : "Adminovich",
+#     "role" : "Administrator"
