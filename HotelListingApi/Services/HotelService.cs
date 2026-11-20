@@ -8,9 +8,9 @@ using HotelListingApi.DTOs.Hotel;
 using AutoMapper.QueryableExtensions;
 using HotelListingApi.Results;
 
-namespace HotelListingApi.Services.HotelsServices;
+namespace HotelListingApi.Services;
 
-public class HotelServices(HotelListingDbContext context, IMapper mapper) : IHotelsServices
+public class HotelService(HotelListingDbContext context, IMapper mapper) : IHotelService
 {
     public async Task<Result<IEnumerable<GetHotelsDto>>> GetHotelsAsync()
     {

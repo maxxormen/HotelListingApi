@@ -1,4 +1,3 @@
-using HotelListingApi.DTOs.Hotel;
 
 namespace HotelListingApi.Data;
 public class Country

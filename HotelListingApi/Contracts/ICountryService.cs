@@ -1,10 +1,9 @@
-using HotelListingApi.Data;
+
 using HotelListingApi.DTOs.Country;
-using HotelListingApi.DTOs.Hotel;
 using HotelListingApi.Results;
 
 namespace HotelListingApi.Contracts;
-public interface ICountriesServices
+public interface ICountryService
 {
     Task<Result<IEnumerable<GetCountriesDto>>> GetCountriesAsync();
     Task<Result<GetCountryDto?>> GetCountryAsync(int id);

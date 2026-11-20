@@ -2,7 +2,7 @@ using HotelListingApi.Contracts;
 using HotelListingApi.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelListingApi.Services.ApiKeyValidatorService;
+namespace HotelListingApi.Services;
 
 public class ApiKeyValidatorService(HotelListingDbContext context) : IApiKeyValidatorService
 {

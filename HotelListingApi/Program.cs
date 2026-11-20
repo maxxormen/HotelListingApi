@@ -1,8 +1,5 @@
 using HotelListingApi.Data;
-using HotelListingApi.Services.CountriesServices;
-using HotelListingApi.Services.HotelsServices;
-using HotelListingApi.Services.UsersServices;
-using HotelListingApi.Services.ApiKeyValidatorService;
+using HotelListingApi.Services;
 using HotelListingApi.MappingProfiles;
 using Microsoft.EntityFrameworkCore;
 using HotelListingApi.Contracts;
@@ -27,6 +24,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<HotelListingDbContext>();
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddAuthentication(options =>
@@ -52,9 +52,10 @@ builder.Services.AddAuthentication(options =>
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationDefaults.BasicScheme, _ => { })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(AuthenticationDefaults.ApiKeyScheme, _ => { });
 
-builder.Services.AddScoped<ICountriesServices, CountriesServices>();
-builder.Services.AddScoped<IHotelsServices, HotelServices>();
-builder.Services.AddScoped<IUsersServices, UsersServices>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<HotelMappingProfile>(), typeof(Program));

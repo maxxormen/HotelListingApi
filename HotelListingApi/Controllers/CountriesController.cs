@@ -12,18 +12,18 @@ namespace HotelListingApi.Controllers;
 [ApiController]
 public class CountriesController : BaseApiController
 {
-    private readonly ICountriesServices countriesServices;
+    private readonly ICountryService countryService;
 
-    public CountriesController(ICountriesServices countriesServices)
+    public CountriesController(ICountryService countryService)
     {
-        this.countriesServices = countriesServices;
+        this.countryService = countryService;
     }
     // GET: api/Countries
     [HttpGet]
     [Authorize]
     public async Task<ActionResult<IEnumerable<GetCountriesDto>>> GetCountries()
     {
-        var result = await countriesServices.GetCountriesAsync();
+        var result = await countryService.GetCountriesAsync();
         return ToActionResult(result);
     }
 
@@ -32,7 +32,7 @@ public class CountriesController : BaseApiController
     [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<GetCountryDto?>> GetCountry(int id)
     {
-        var result = await countriesServices.GetCountryAsync(id);
+        var result = await countryService.GetCountryAsync(id);
         return ToActionResult(result);
     }
 
@@ -42,7 +42,7 @@ public class CountriesController : BaseApiController
     [Authorize(Roles = "Administrator")]
     public async Task<ActionResult> PutCountry(int id, UpdateCountryDto countryDto)
     {
-        var result = await countriesServices.UpdateCountryAsync(id, countryDto);
+        var result = await countryService.UpdateCountryAsync(id, countryDto);
         return ToActionResult(result);
     }
 
@@ -52,7 +52,7 @@ public class CountriesController : BaseApiController
     [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<Country>> PostCountry(CreateCountryDto countryDto)
     {
-        var result = await countriesServices.CreateCountryAsync(countryDto);
+        var result = await countryService.CreateCountryAsync(countryDto);
         if (!result.IsSuccess) return MapErrorsToResponse(result.Errors);
         return CreatedAtAction(nameof(GetCountry), new { id = result.Value!.CountryId }, result.Value);
     }
@@ -62,7 +62,7 @@ public class CountriesController : BaseApiController
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteCountry(int id)
     {
-        var result = await countriesServices.DeleteCountryAsync(id);
+        var result = await countryService.DeleteCountryAsync(id);
         return ToActionResult(result);
     }
 }

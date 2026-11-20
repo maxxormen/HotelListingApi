@@ -1,11 +1,9 @@
-using HotelListingApi.Data;
-using HotelListingApi.DTOs.Country;
 using HotelListingApi.DTOs.Hotel;
 using HotelListingApi.Results;
 
 namespace HotelListingApi.Contracts;
 
-public interface IHotelsServices
+public interface IHotelService
 {
     Task<Result<IEnumerable<GetHotelsDto>>> GetHotelsAsync();
     Task<Result<GetHotelDto?>> GetHotelAsync(int id);

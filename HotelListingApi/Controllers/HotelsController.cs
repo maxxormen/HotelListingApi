@@ -9,18 +9,18 @@ namespace HotelListingApi.Controllers;
 [ApiController]
 public class HotelsController : BaseApiController
 {
-    private readonly IHotelsServices hotelsServices;
+    private readonly IHotelService hotelService;
 
-    public HotelsController(IHotelsServices hotelsServices)
+    public HotelsController(IHotelService hotelService)
     {
-        this.hotelsServices = hotelsServices;
+        this.hotelService = hotelService;
     }
 
     // GET: api/Hotels
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetHotelsDto>>> GetHotels()
     {
-        var result = await hotelsServices.GetHotelsAsync();
+        var result = await hotelService.GetHotelsAsync();
         return ToActionResult(result);
     }
 
@@ -28,7 +28,7 @@ public class HotelsController : BaseApiController
     [HttpGet("{id}")]
     public async Task<ActionResult<GetHotelDto?>> GetHotel(int id)
     {
-        var result = await hotelsServices.GetHotelAsync(id);
+        var result = await hotelService.GetHotelAsync(id);
         return ToActionResult(result);
     }
 
@@ -37,7 +37,7 @@ public class HotelsController : BaseApiController
     [HttpPut("{id}")]
     public async Task<IActionResult> PutHotel(int id, UpdateHotelDto hotelDto)
     {
-        var result = await hotelsServices.UpdateHotelAsync(id, hotelDto);
+        var result = await hotelService.UpdateHotelAsync(id, hotelDto);
         return ToActionResult(result);
     }
 
@@ -46,7 +46,7 @@ public class HotelsController : BaseApiController
     [HttpPost]
     public async Task<ActionResult<GetHotelDto>> PostHotel(CreateHotelDto hotelDto)
     {
-        var result = await hotelsServices.CreateHotelAsync(hotelDto);
+        var result = await hotelService.CreateHotelAsync(hotelDto);
         if (!result.IsSuccess) return MapErrorsToResponse(result.Errors);
 
         return CreatedAtAction(nameof(GetHotel), new { id = result.Value!.Id }, result.Value);
@@ -56,7 +56,7 @@ public class HotelsController : BaseApiController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteHotel(int id)
     {
-        var result = await hotelsServices.DeleteHotelAsync(id);
+        var result = await hotelService.DeleteHotelAsync(id);
         return ToActionResult(result);
     }
 }

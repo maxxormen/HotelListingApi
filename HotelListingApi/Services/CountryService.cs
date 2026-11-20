@@ -8,9 +8,9 @@ using HotelListingApi.Results;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
-namespace HotelListingApi.Services.CountriesServices;
+namespace HotelListingApi.Services;
 
-public class CountriesServices(HotelListingDbContext context, IMapper mapper) : ICountriesServices
+public class CountryService(HotelListingDbContext context, IMapper mapper) : ICountryService
 {
     public async Task<Result<IEnumerable<GetCountriesDto>>> GetCountriesAsync()
     {

@@ -10,23 +10,23 @@ namespace HotelListingApi.Controllers;
 [AllowAnonymous]
 public class AuthController : BaseApiController
 {
-    private readonly IUsersServices usersService;
-    public AuthController(IUsersServices usersService)
+    private readonly IUserService userService;
+    public AuthController(IUserService userService)
     {
-        this.usersService = usersService;
+        this.userService = userService;
     }
 
     [HttpPost("register")]
     public async Task<ActionResult<RegisteredUserDto>> Register(RegisterUserDto registerUserDto)
     {
-        var result = await usersService.RegisterAsync(registerUserDto);
+        var result = await userService.RegisterAsync(registerUserDto);
         return ToActionResult(result);
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(LoginUserDto loginUserDto)
     {
-       var result = await usersService.LoginAsync(loginUserDto);
+       var result = await userService.LoginAsync(loginUserDto);
        return ToActionResult(result);
     }
 }

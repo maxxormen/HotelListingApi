@@ -6,15 +6,13 @@ using HotelListingApi.Data;
 using HotelListingApi.DTOs.Auth;
 using HotelListingApi.Results;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace HotelListingApi.Services.UsersServices;
+namespace HotelListingApi.Services;
 
-public class UsersServices(UserManager<ApplicationUser> userManager, IMapper mapper,
-    IConfiguration configuration) : IUsersServices
+public class UserService(UserManager<ApplicationUser> userManager, IMapper mapper,
+    IConfiguration configuration) : IUserService
 {
     public async Task<Result<RegisteredUserDto>> RegisterAsync(RegisterUserDto registerUserDto)
     {
