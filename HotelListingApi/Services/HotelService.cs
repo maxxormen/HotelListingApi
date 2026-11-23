@@ -3,6 +3,7 @@ using AutoMapper;
 
 using HotelListingApi.Data;
 using HotelListingApi.Contracts;
+using HotelListingApi.Constants;
 using HotelListingApi.DTOs.Country;
 using HotelListingApi.DTOs.Hotel;
 using AutoMapper.QueryableExtensions;
@@ -59,7 +60,7 @@ public class HotelService(HotelListingDbContext context, IMapper mapper) : IHote
             var hotel = await context.Hotels.FindAsync(id);
             if (hotel == null)
             {
-                return Result.NotFound(new Error("NotFound", $"Hotel '{id}' not found"));
+                return Result.NotFound(new Error(ErrorCodes.NotFound, $"Hotel '{id}' not found"));
             }
 
             // Update the tracked entity in place
@@ -81,7 +82,7 @@ public class HotelService(HotelListingDbContext context, IMapper mapper) : IHote
             var exists = await HotelExistsAsync(hotelDto.Name);
             if(exists)
             {
-                return Result<GetHotelDto>.BadRequest(new Error("Duplicate", $"Hotel '{hotelDto.Name}' already exists"));
+                return Result<GetHotelDto>.BadRequest(new Error(ErrorCodes.Duplicate, $"Hotel '{hotelDto.Name}' already exists"));
             }
             var hotel = mapper.Map<Hotel>(hotelDto);
             context.Hotels.Add(hotel);
@@ -106,7 +107,7 @@ public class HotelService(HotelListingDbContext context, IMapper mapper) : IHote
             var hotel = await context.Hotels.FindAsync(id);
             if (hotel is null)
             {
-                return Result.NotFound(new Error("NotFound", $"Hotel '{id}' could not be found"));
+                return Result.NotFound(new Error(ErrorCodes.NotFound, $"Hotel '{id}' could not be found"));
             }
             await context.Hotels
                 .Where(h => h.Id == id)

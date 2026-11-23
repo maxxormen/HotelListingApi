@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using HotelListingApi.Results; 
+using HotelListingApi.Constants;
+using HotelListingApi.Results;
 
 namespace HotelListingApi.Controllers;
 
@@ -18,11 +19,12 @@ public abstract class BaseApiController : ControllerBase
         var e = errors[0];
         return e.Code switch
         {
-            "NotFound" => NotFound(e.Description),
-            "BadRequest" => BadRequest(e.Description),
-            "Validation" => BadRequest(e.Description),
-            "Conflict" => Conflict(e.Description),
-            "Duplicate" => BadRequest(e.Description),
+            ErrorCodes.NotFound => NotFound(e.Description),
+            ErrorCodes.BadRequest => BadRequest(e.Description),
+            ErrorCodes.Validation => BadRequest(e.Description),
+            ErrorCodes.Conflict => Conflict(e.Description),
+            ErrorCodes.Duplicate => BadRequest(e.Description),
+            ErrorCodes.Forbid => Forbid(e.Description),
             _ => Problem(detail: string.Join(": ",
                 errors.Select(x => x.Description)), title : e.Code)
         };

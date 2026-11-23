@@ -4,6 +4,7 @@ using HotelListingApi.Data;
 using HotelListingApi.DTOs.Country;
 using HotelListingApi.DTOs.Hotel;
 using HotelListingApi.Contracts;
+using HotelListingApi.Constants;
 using HotelListingApi.Results;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -53,7 +54,7 @@ public class CountryService(HotelListingDbContext context, IMapper mapper) : ICo
 
             if (country == null)
             {
-                return Result.NotFound(new Error("NotFound", $"Country '{id}' could not be found"));
+                return Result.NotFound(new Error(ErrorCodes.NotFound, $"Country '{id}' could not be found"));
             }
 
             mapper.Map(countryDto, country);
@@ -74,7 +75,7 @@ public class CountryService(HotelListingDbContext context, IMapper mapper) : ICo
             var exists = await CountryExistsAsync(countryDto.Name);
             if (exists)
             {
-                return Result<GetCountryDto>.Failure(new Error("Conflict", "A country with the same name already exists."));
+                return Result<GetCountryDto>.Failure(new Error(ErrorCodes.Conflict, "A country with the same name already exists."));
             }
 
             var country = mapper.Map<Country>(countryDto);
@@ -99,7 +100,7 @@ public class CountryService(HotelListingDbContext context, IMapper mapper) : ICo
             var country = await context.Countries.FindAsync(id);
             if (country is null)
             {
-                return Result.NotFound(new Error("NotFound", $"Country '{id}' could not be found"));
+                return Result.NotFound(new Error(ErrorCodes.NotFound, $"Country '{id}' could not be found"));
             }
             await context.Countries
                 .Where(q => q.CountryId == id)

@@ -1,10 +1,11 @@
 using System.Security.Permissions;
+using HotelListingApi.Constants;
 
 namespace HotelListingApi.Results;
 
 public readonly record struct Error(string Code, string Description)
 {
-    public static readonly Error None = new("NotFound", "The requested resource was not found.");
+    public static readonly Error None = new(ErrorCodes.NotFound, "The requested resource was not found.");
     public bool IsNone => string.IsNullOrWhiteSpace(Code);
 }
 

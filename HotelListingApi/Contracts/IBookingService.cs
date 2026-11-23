@@ -8,4 +8,7 @@ public interface IBookingService
     Task<Result<GetBookingDto>> CreateBookingAsync(CreateBookingDto bookingDto);
     Task<Result<GetBookingDto>> UpdateBookingAsync(int hotelId, int bookingId, UpdateBookingDto bookingDto);
     Task<Result> CancelBookingAsync(int hotelId, int bookingId);
+    Task<Result> AdminCancelBookingAsync(int hotelId, int bookingId);
+    Task<Result> AdminConfirmBookingAsync(int hotelId, int bookingId);
+    Task<Result<IEnumerable<GetBookingDto>>> GetUserBookingsForHotelAsync(int hotelId);
 }

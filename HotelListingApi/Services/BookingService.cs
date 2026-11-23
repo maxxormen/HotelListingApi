@@ -7,17 +7,31 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace HotelListingApi.Services;
 
-public class BookingService(HotelListingDbContext context, IHttpContextAccessor httpClientAccessor) : IBookingService
+public class BookingService(HotelListingDbContext context, IUserService userService) : IBookingService
 {
     public async Task<Result<IEnumerable<GetBookingDto>>> GetBookingsForHotelAsync(int id)
     {
+        var userId = userService.UserId;
+
+        var hotelAdmin = await context.HotelAdmins
+            .FirstOrDefaultAsync(ha => ha.HotelId == id && ha.UserId == userId);
+
+        if (hotelAdmin is null)
+        {
+            return Result<IEnumerable<GetBookingDto>>.Failure(new Error
+            {
+                Code = ErrorCodes.Forbid,
+                Description = "You are not an admin for this hotel."
+            });
+        }
+
         var hotelExists = await context.Hotels.AnyAsync(h => h.Id == id);
 
         if (!hotelExists)
         {
             return Result<IEnumerable<GetBookingDto>>.Failure(new Error
             {
-                Code = "HotelNotFound",
+                Code = ErrorCodes.NotFound,
                 Description = $"Hotel with id {id} not found."
             });
         }
@@ -41,19 +55,50 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         return Result<IEnumerable<GetBookingDto>>.Success(bookings);
     }
 
+    public async Task<Result<IEnumerable<GetBookingDto>>> GetUserBookingsForHotelAsync(int hotelId)
+    {
+        var userId = userService.UserId;
+
+        var hotelExists = await context.Hotels.AnyAsync(h => h.Id == hotelId);
+
+        if (!hotelExists)
+        {
+            return Result<IEnumerable<GetBookingDto>>.Failure(new Error
+            {
+                Code = ErrorCodes.NotFound,
+                Description = $"Hotel with id {hotelId} not found."
+            });
+        }
+    
+        var bookings = await context.Bookings
+            .Where(b => b.HotelId == hotelId && b.UserId == userId)
+            .OrderBy(b => b.CheckIn)
+            .Select(b => new GetBookingDto(
+                b.Id,
+                b.HotelId,
+                b.Hotel!.Name,
+                b.CheckIn,
+                b.CheckOut,
+                b.Guests,
+                b.TotalPrice,
+                b.CreatedAtUtc,
+                b.UpdatedAtUtc,
+                b.Status.ToString()
+            )).ToListAsync();
+
+        return Result<IEnumerable<GetBookingDto>>.Success(bookings);
+    }
+
     public async Task<Result<GetBookingDto>> CreateBookingAsync(CreateBookingDto bookingDto)
     
     {
-        var userId = httpClientAccessor?
-        .HttpContext?
-        .User?
-        .FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = userService.UserId;
 
         if (userId == null || string.IsNullOrWhiteSpace(userId))
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "User is required."
             });
         }
@@ -64,28 +109,8 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "NotFound",
+                Code = ErrorCodes.NotFound,
                 Description = $"Hotel with id {bookingDto.HotelId} not found."
-            });
-        }
-
-        var nights = bookingDto.CheckOut.DayNumber - bookingDto.CheckIn.DayNumber;
-
-        if (nights <= 0)
-        {
-            return Result<GetBookingDto>.Failure(new Error
-            {
-                Code = "Validation",
-                Description = "Check-out date must be after check-in date."
-            });
-        }
-
-        if (bookingDto.Guests <= 0)
-        {
-            return Result<GetBookingDto>.Failure(new Error
-            {
-                Code = "Validation",
-                Description = "Number of guests must be greater than zero."
             });
         }
 
@@ -101,10 +126,12 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "Booking overlaps with an existing booking."
             });
         }
+
+        var nights = bookingDto.CheckOut.DayNumber - bookingDto.CheckIn.DayNumber;
 
         var totalPrice = nights * hotel.PerNightRate * bookingDto.Guests;
         var booking = new Booking
@@ -138,28 +165,14 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
 
     public async Task<Result<GetBookingDto>> UpdateBookingAsync(int hotelId, int bookingId, UpdateBookingDto bookingDto)
     {
-        var userId = httpClientAccessor?
-        .HttpContext?
-        .User?
-        .FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = userService.UserId;
 
         if (userId == null || string.IsNullOrWhiteSpace(userId))
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "User is required."
-            });
-        }
-
-        var nights = bookingDto.CheckOut.DayNumber - bookingDto.CheckIn.DayNumber;
-
-        if (nights <= 0)
-        {
-            return Result<GetBookingDto>.Failure(new Error
-            {
-                Code = "Validation",
-                Description = "Check-out date must be after check-in date."
             });
         }
 
@@ -167,7 +180,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "Number of guests must be greater than zero."
             });
         }
@@ -176,7 +189,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
             b.HotelId == bookingDto.HotelId &&
             b.Status != BookingStatus.Cancelled &&
             b.CheckIn < bookingDto.CheckOut &&
-            bookingDto.CheckIn < b.CheckOut &&
+            b.CheckOut > bookingDto.CheckIn &&
             b.UserId == userId
         );
 
@@ -184,7 +197,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "Booking overlaps with an existing booking."
             });
         }
@@ -199,7 +212,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "NotFound",
+                Code = ErrorCodes.NotFound,
                 Description = $"Booking with id {bookingId} for hotel {hotelId} not found."
             });
         }
@@ -208,10 +221,12 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "Cannot update a cancelled booking."
             });
         }
+
+        var nights = bookingDto.CheckOut.DayNumber - bookingDto.CheckIn.DayNumber;
 
         var perNightRate = booking.Hotel!.PerNightRate;
         booking.CheckIn = bookingDto.CheckIn;
@@ -239,10 +254,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
 
     public async Task<Result> CancelBookingAsync(int hotelId, int bookingId)
     {
-        var userId = httpClientAccessor?
-        .HttpContext?
-        .User?
-        .FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = userService.UserId;
 
         var booking = await context.Bookings
             .FirstOrDefaultAsync(b => b.Id == bookingId 
@@ -253,7 +265,7 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result.Failure(new Error
             {
-                Code = "NotFound",
+                Code = ErrorCodes.NotFound,
                 Description = $"Booking with id {bookingId} for hotel {hotelId} not found."
             });
         }
@@ -262,12 +274,102 @@ public class BookingService(HotelListingDbContext context, IHttpContextAccessor 
         {
             return Result.Failure(new Error
             {
-                Code = "Validation",
+                Code = ErrorCodes.Validation,
                 Description = "Booking is already cancelled."
             });
         }
 
         booking.Status = BookingStatus.Cancelled;
+        booking.UpdatedAtUtc = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> AdminCancelBookingAsync(int hotelId, int bookingId)
+    {
+        var userId = userService.UserId;
+
+        var hotelUserAdmin = await context.HotelAdmins
+            .FirstOrDefaultAsync(ha => ha.HotelId == hotelId && ha.UserId == userId);
+
+        if (hotelUserAdmin is null)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.Forbid,
+                Description = "You are not an admin for this hotel."
+            });
+        }
+
+        var booking = await context.Bookings
+            .FirstOrDefaultAsync(b => b.Id == bookingId && b.HotelId == hotelId);
+
+        if (booking is null)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.NotFound,
+                Description = $"Booking with id {bookingId} for hotel {hotelId} not found."
+            });
+        }
+
+        if (booking.Status == BookingStatus.Cancelled)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.Validation,
+                Description = "Booking is already cancelled."
+            });
+        }
+
+        booking.Status = BookingStatus.Cancelled;
+        booking.UpdatedAtUtc = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> AdminConfirmBookingAsync(int hotelId, int bookingId)
+    {
+        var userId = userService.UserId;
+
+        var hotelUserAdmin = await context.HotelAdmins
+            .FirstOrDefaultAsync(ha => ha.HotelId == hotelId && ha.UserId == userId);
+
+        if (hotelUserAdmin is null)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.Forbid,
+                Description = "You are not an admin for this hotel."
+            });
+        }
+
+        var booking = await context.Bookings
+            .FirstOrDefaultAsync(b => b.Id == bookingId && b.HotelId == hotelId);
+
+        if (booking is null)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.NotFound,
+                Description = $"Booking with id {bookingId} for hotel {hotelId} not found."
+            });
+        }
+
+        if (booking.Status == BookingStatus.Confirmed)
+        {
+            return Result.Failure(new Error
+            {
+                Code = ErrorCodes.Validation,
+                Description = "Booking is already confirmed."
+            });
+        }
+
+        booking.Status = BookingStatus.Confirmed;
         booking.UpdatedAtUtc = DateTime.UtcNow;
 
         await context.SaveChangesAsync();
