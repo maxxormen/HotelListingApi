@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,11 +60,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IApiKeyValidatorService, ApiKeyValidatorService>();
 
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<HotelMappingProfile>(), typeof(Program));
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<CountryMappingProfile>(), typeof(Program));
+builder.Services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Theres also optional .AddJsonOptions (seen on 3:26 lesson 140)
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using HotelListingApi.Data;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+
+
 
 namespace HotelListingApi.AuthorizationFilters;
 
@@ -31,7 +34,8 @@ public class HotelOrSystemAdminFilter(HotelListingDbContext dbContext) : IAsyncA
             return;
         }
 
-        var userId = httpUser.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = httpUser.FindFirst(JwtRegisteredClaimNames.Sub)?.Value 
+            ?? httpUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrWhiteSpace(userId))
         {
             context.Result = new ForbidResult();

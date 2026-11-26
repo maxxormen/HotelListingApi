@@ -15,9 +15,14 @@ public class UserService(UserManager<ApplicationUser> userManager, IMapper mappe
     IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IUserService
 {
     public string UserId => httpContextAccessor?
-        .HttpContext?
-        .User?
-        .FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
+            .HttpContext?
+            .User?
+            .FindFirst(JwtRegisteredClaimNames.Sub)?.Value 
+        ?? httpContextAccessor?
+            .HttpContext?
+            .User?
+            .FindFirst(ClaimTypes.NameIdentifier)?.Value 
+        ?? string.Empty;
     public async Task<Result<RegisteredUserDto>> RegisterAsync(RegisterUserDto registerUserDto)
     {
         var user = mapper.Map<ApplicationUser>(registerUserDto);

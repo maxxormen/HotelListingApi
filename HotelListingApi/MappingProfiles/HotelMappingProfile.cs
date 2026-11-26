@@ -13,6 +13,7 @@ public class HotelMappingProfile : Profile
         CreateMap<Hotel, GetHotelDto>()
             .ForMember(dest => dest.Country,
             opt => opt.MapFrom(src => src.Country != null ? src.Country.Name : null));
+        // possibly will need to map through CountryNameResolver
         CreateMap<Hotel, GetHotelSlimDto>();
         CreateMap<CreateHotelDto, Hotel>();
         CreateMap<UpdateHotelDto, Hotel>();
