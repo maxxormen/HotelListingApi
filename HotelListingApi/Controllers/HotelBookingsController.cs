@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using HotelListingApi.DTOs.Booking;
 using HotelListingApi.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using HotelListingApi.AuthorizationFilters;
 
 namespace HotelListingApi.Controllers;
 
@@ -10,8 +11,8 @@ namespace HotelListingApi.Controllers;
 [Route("api/hotels/{hotelId:int}/bookings")]
 public class HotelBookingsController(IBookingService bookingService) : BaseApiController
 {
-    [HttpGet]
-    [Authorize(Roles = "Hotel Admin, Administrator")]
+    [HttpGet("admin")]
+    [HotelOrSystemAdmin]
     public async Task<ActionResult<IEnumerable<GetBookingDto>>> GetBookings([FromRoute] int hotelId)
     {
         var result = await bookingService.GetBookingsForHotelAsync(hotelId);
@@ -19,7 +20,7 @@ public class HotelBookingsController(IBookingService bookingService) : BaseApiCo
     }
 
     [HttpGet]
-    [Authorize(Roles = "Hotel Admin, Administrator")]
+    [HotelOrSystemAdmin]
     public async Task<ActionResult<IEnumerable<GetBookingDto>>> GetUserBooking([FromRoute] int hotelId)
     {
         var result = await bookingService.GetUserBookingsForHotelAsync(hotelId);
@@ -44,14 +45,14 @@ public class HotelBookingsController(IBookingService bookingService) : BaseApiCo
         return ToActionResult(result);
     }
 
-    [HttpDelete("{bookingId:int}/cancel")]
+    [HttpPut("{bookingId:int}/cancel")]
     public async Task<IActionResult> CancelBooking([FromRoute] int hotelId, [FromRoute] int bookingId)
     {
         var result = await bookingService.CancelBookingAsync(hotelId, bookingId);
         return ToActionResult(result);
     }
 
-    [Authorize(Roles = "Hotel Admin, Administrator")]
+    [HotelOrSystemAdmin]
     [HttpPut("{bookingId:int}/admin/cancel")]
     public async Task<IActionResult> AdminCancelBooking([FromRoute] int hotelId, [FromRoute] int bookingId)
     {
@@ -59,7 +60,7 @@ public class HotelBookingsController(IBookingService bookingService) : BaseApiCo
         return ToActionResult(result);
     }
 
-    [Authorize(Roles = "Hotel Admin, Administrator")]
+    [HotelOrSystemAdmin]
     [HttpPut("{bookingId:int}/admin/confirm")]
     public async Task<IActionResult> AdminConfirmBooking([FromRoute] int hotelId, [FromRoute] int bookingId)
     {

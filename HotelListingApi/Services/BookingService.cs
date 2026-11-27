@@ -102,7 +102,7 @@ public class BookingService(HotelListingDbContext context, IUserService userServ
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = ErrorCodes.Validation,
+                Code = ErrorCodes.Conflict,
                 Description = "Booking overlaps with an existing booking."
             });
         }
@@ -144,13 +144,13 @@ public class BookingService(HotelListingDbContext context, IUserService userServ
             });
         }
 
-        var overlaps = await IsOverLap(hotelId, userId, bookingDto.CheckIn, bookingDto.CheckOut);
+        var overlaps = await IsOverLap(hotelId, userId, bookingDto.CheckIn, bookingDto.CheckOut, bookingId);
 
         if (overlaps)
         {
             return Result<GetBookingDto>.Failure(new Error
             {
-                Code = ErrorCodes.Validation,
+                Code = ErrorCodes.Conflict,
                 Description = "Booking overlaps with an existing booking."
             });
         }
@@ -320,13 +320,20 @@ public class BookingService(HotelListingDbContext context, IUserService userServ
         return Result.Success();
     }
 
-    public async Task<bool> IsOverLap(int hotelId,string userId, DateOnly checkIn, DateOnly checkOut)
+    public async Task<bool> IsOverLap(int hotelId,string userId,
+        DateOnly checkIn, DateOnly checkOut, int? bookingId = null)
     {
-        return await context.Bookings.AnyAsync(b =>
+        var query = context.Bookings.Where(b =>
             b.HotelId == hotelId &&
             b.Status != BookingStatus.Cancelled &&
             b.CheckIn < checkOut &&
             b.CheckOut > checkIn &&
-            b.UserId == userId);
+            b.UserId == userId).AsQueryable();
+        if (bookingId.HasValue)
+        {
+            query = query.Where(b => b.Id != bookingId.Value);
+        }
+
+        return await query.AnyAsync();
     }
 }

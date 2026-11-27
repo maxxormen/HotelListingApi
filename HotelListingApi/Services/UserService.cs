@@ -8,11 +8,13 @@ using HotelListingApi.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace HotelListingApi.Services;
 
 public class UserService(UserManager<ApplicationUser> userManager, IMapper mapper,
-    IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IUserService
+    IConfiguration configuration, IHttpContextAccessor httpContextAccessor,
+    HotelListingDbContext hotelListingDbContext) : IUserService
 {
     public string UserId => httpContextAccessor?
             .HttpContext?
@@ -36,6 +38,17 @@ public class UserService(UserManager<ApplicationUser> userManager, IMapper mappe
         }
 
         await userManager.AddToRoleAsync(user, registerUserDto.Role);
+
+        if (registerUserDto.Role == "Hotel Admin")
+        {
+            var hotelAdmin = hotelListingDbContext.HotelAdmins.Add(
+                new HotelAdmin
+                {
+                    UserId = user.Id,
+                    HotelId = registerUserDto.AssociatedHotelId.GetValueOrDefault()
+                });
+            await hotelListingDbContext.SaveChangesAsync();
+        }
 
         var registeredUserDto = mapper.Map<RegisteredUserDto>(user);
 

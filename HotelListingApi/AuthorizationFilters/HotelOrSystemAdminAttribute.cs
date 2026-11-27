@@ -23,7 +23,7 @@ public class HotelOrSystemAdminFilter(HotelListingDbContext dbContext) : IAsyncA
     {
         var httpUser = context.HttpContext.User;
 
-        if (!httpUser.Identity?.IsAuthenticated == false)
+        if (httpUser.Identity?.IsAuthenticated != true)
         {
             context.Result = new UnauthorizedResult();
             return;

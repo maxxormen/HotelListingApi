@@ -23,6 +23,7 @@ public sealed class BookingMappingProfile : Profile
 
         CreateMap<UpdateBookingDto, Booking>()
             .ForMember(d => d.Id, o => o.Ignore())
+            .ForMember(d => d.HotelId, o => o.Ignore())
             .ForMember(d => d.UserId, o => o.Ignore())
             .ForMember(d => d.TotalPrice, o => o.Ignore())
             .ForMember(d => d.Status, o => o.Ignore())
